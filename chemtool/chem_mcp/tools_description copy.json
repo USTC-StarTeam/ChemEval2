@@ -1,0 +1,188 @@
+[
+    {
+      "type": "function",
+      "function": {
+        "name": "image2smiles",
+        "description": "将化学分子结构图像转换为对应的 SMILES 字符串。该工具利用 MolScribe 模型对输入的分子图像进行分析，并生成可用于计算化学和分子建模的标准化 SMILES 表示。适用于从文献、专利或手绘图像中提取分子结构信息的场景。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "image_path": {
+              "type": "string",
+              "description": "包含化学分子结构的图像文件路径（支持常见格式如 JPEG、PNG）。"
+            }
+          },
+          "required": ["image_path"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "smiles_inchi_convert",
+        "description": "在 SMILES 与 InChI 两种常见分子结构表示之间进行双向转换，并返回规范化结果。该工具首先将输入解析为 RDKit 的 Mol 对象，然后生成 canonical SMILES、标准 InChI 以及对应的 InChIKey。适用于分子表示规范化、去重、数据库索引、以及不同化学工具链之间的格式转换场景。注意：SMILES 与 InChI 参数必须且只能提供一个。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "分子的 SMILES 字符串表示，例如 'CCO'（乙醇）。支持芳香结构、手性标记、电荷和环结构。"
+            },
+            "inchi": {
+              "type": "string",
+              "description": "分子的 InChI 字符串表示，例如 'InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3'。必须以 'InChI=' 开头。"
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "basic_physchem",
+        "description": "根据输入的分子结构（SMILES 或 InChI），计算常用的基础理化与药物化学性质。包括分子量（MolWt）、脂水分配系数（LogP）、拓扑极性表面积（TPSA）、氢键供体数（HBD）、氢键受体数（HBA）以及环数量（RingCount）。该工具常用于 QSAR 建模、药物相似性分析、Lipinski 规则评估等任务。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "分子的 SMILES 字符串表示。若提供该参数，将优先使用。"
+            },
+            "inchi": {
+              "type": "string",
+              "description": "分子的 InChI 字符串表示。若未提供 SMILES，则使用 InChI 解析分子。"
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "formula_and_mass",
+        "description": "根据输入的分子结构（SMILES 或 InChI），计算分子的分子式和单同位素精确质量。分子式反映了分子的原子组成（如 C、H、O、N 的数量），精确质量（ExactMass）常用于质谱分析、化合物鉴定和同分异构体区分。该工具适用于结构确认、质谱数据解析以及化学数据库比对等应用场景。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "分子的 SMILES 字符串表示。若提供该参数，将优先使用。"
+            },
+            "inchi": {
+              "type": "string",
+              "description": "分子的 InChI 字符串表示。若未提供 SMILES，则使用 InChI 解析分子。"
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "stereo",
+        "description": "从给定的 SMILES 字符串中解析并提取分子的立体化学信息。包括手性中心数量、每个中心的 R/S 构型、E/Z 双键构型，以及 RDKit 所能识别的全部立体特征。特别适用于需要检查立体纯度、生成立体同分异构体、或验证结构立体一致性的任务。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "输入分子的 SMILES 字符串（支持含立体标记或自动推断手性）。"
+            }
+          },
+          "required": ["smiles"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "functional_groups",
+        "description": "自动识别 SMILES 对应分子中的常见官能团。工具基于子结构模式（SMARTS）匹配，能够检测诸如羰基、羧酸、酰胺、醇、胺、芳环、卤代物、硫醇、腈等多种有机化学官能团，并给出具体匹配位置。适用于反应性分析、逆合成规划、QSAR、特征工程等任务。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "分子的 SMILES 字符串。工具将根据 SMARTS 模式库自动搜索所有可能官能团。"
+            }
+          },
+          "required": ["smiles"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "name2smiles",
+        "description": "根据英文化学物质名称查询对应的标准化 SMILES 表示。该工具会根据数据库检索名称的规范结构式，并返回能用于 RDKit 解析的有效 SMILES。支持常用化合物名称、药物名称、部分俗名。适用于文本信息抽取、结构检索和快速查询。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "英文化学物质名称，如 'aspirin'、'benzene' 等。"
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "name2cas",
+        "description": "根据英文化学物质名称查询其对应的 CAS 登记号。此工具可用于化学品标准化存档、材料检索、数据库交叉引用等场景。支持常见化合物、药物以及部分实验试剂的名称查询。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "化学品英文名称，例如 'acetone'、'aspirin' 等。"
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "predict_reaction",
+        "description": "根据反应物（reactants）与可选试剂（reagent）的 SMILES，预测最可能的化学反应产物。支持多组分混合物、金属盐、溶剂等结构。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "reactants": {
+              "type": "string",
+              "description": "反应物 SMILES，可为单体或多组分体系（用 '.' 分隔），支持手性中心、金属离子、盐和复杂结构。"
+            },
+            "reagent": {
+              "type": "string",
+              "description": "可选试剂 SMILES，可为空。支持单组分或多组分结构。"
+            }
+          },
+          "required": ["reactants"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "predict_retrosynthetic",
+        "description": "根据输入产物（product）的 SMILES，预测其逆合成前体（reactants）。模型会根据断键策略与已学反应模式自动生成最可能的前体组合。",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "product": {
+              "type": "string",
+              "description": "目标产物的 SMILES 字符串，例如 'CC(=O)Oc1ccccc1C(=O)O'。"
+            }
+          },
+          "required": ["product"]
+        }
+      }
+    }
+  ]

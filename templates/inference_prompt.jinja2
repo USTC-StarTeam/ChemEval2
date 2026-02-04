@@ -1,0 +1,21 @@
+You are an expert scientist with advanced capabilities in multimodal reasoning.
+
+Please solve the following problem.
+
+### Question
+{{ question }}
+
+### Instructions
+{% if has_image %}
++ **Visual Grounding**: The problem includes image(s). First, carefully examine the visual details (e.g., chemical structures, reaction conditions on arrows, graph trends, or physical setups). **Incorporate these visual findings** directly into your reasoning.
+{% endif %}
+
++ **Step-by-Step Reasoning**:
+   - Think through the problem logically.
+   - Apply relevant scientific principles and formulas.
+   - Perform calculations explicitly if needed.
+   - Ensure your reasoning is consistent with both the text and the visual evidence.
+
++ **Conclusion**: Provide a clear and final answer.
+
+Think step by step.

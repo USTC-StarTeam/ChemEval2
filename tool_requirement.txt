@@ -1,0 +1,17 @@
+fastapi==0.124.2
+uvicorn==0.38.0
+pydantic==2.12.5
+numpy==1.26.4
+torch==2.9.1
+torchvision==0.24.1
+transformers==4.40.2
+rdkit==2025.09.3
+scikit-learn==1.8.0
+scikit-image==0.25.2
+opencv-python==4.9.0.80
+Jinja2==3.1.6
+requests==2.32.5
+PyYAML==6.0.3
+RXN4Chemistry @ git+https://github.com/rxn4chemistry/rxn4chemistry.git
+MolScribe @ git+https://github.com/thomas0809/MolScribe.git
+EFGs @ git+https://github.com/HelloJocelynLu/EFGs.git

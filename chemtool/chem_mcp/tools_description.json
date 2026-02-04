@@ -1,0 +1,188 @@
+[
+    {
+      "type": "function",
+      "function": {
+        "name": "image2smiles",
+        "description": "Converts a chemical molecular structure image into the corresponding SMILES string. This tool uses the MolScribe model to analyze the input molecular image and generates a standardized SMILES representation suitable for computational chemistry and molecular modeling. It is applicable for extracting molecular structure information from literature, patents, or hand-drawn images.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "image_path": {
+              "type": "string",
+              "description": "Path to the image file containing the chemical molecular structure (supports common formats like JPEG, PNG)."
+            }
+          },
+          "required": ["image_path"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "smiles_inchi_convert",
+        "description": "Performs bidirectional conversion between the common molecular representations SMILES and InChI, returning normalized results. This tool first parses the input into an RDKit Mol object, then generates canonical SMILES, standard InChI, and the corresponding InChIKey. It is suitable for molecular representation normalization, deduplication, database indexing, and format conversion across different chemistry toolchains. Note: Only one of SMILES or InChI must be provided.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "The SMILES string representation of the molecule, e.g., 'CCO' (ethanol). Supports aromatic structures, chiral labels, charges, and ring structures."
+            },
+            "inchi": {
+              "type": "string",
+              "description": "The InChI string representation of the molecule, e.g., 'InChI=1S/C2H6O/c1-2-3/h3H,2H2,1H3'. Must start with 'InChI='."
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "basic_physchem",
+        "description": "Calculates common basic physicochemical and drug-like properties based on the input molecular structure (SMILES or InChI). Properties include molecular weight (MolWt), lipophilicity (LogP), topological polar surface area (TPSA), number of hydrogen bond donors (HBD), number of hydrogen bond acceptors (HBA), and ring count (RingCount). This tool is commonly used for QSAR modeling, drug similarity analysis, and Lipinski rule evaluation.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "The SMILES string representation of the molecule. If provided, it will be used preferentially."
+            },
+            "inchi": {
+              "type": "string",
+              "description": "The InChI string representation of the molecule. Used if SMILES is not provided."
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "formula_and_mass",
+        "description": "Calculates the molecular formula and monoisotopic exact mass of a molecule based on the input structure (SMILES or InChI). The molecular formula reflects the atomic composition (e.g., counts of C, H, O, N), and the exact mass (ExactMass) is commonly used in mass spectrometry analysis, compound identification, and isomer distinction. This tool is applicable for structure confirmation, mass spectrometry data interpretation, and chemical database comparison.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "The SMILES string representation of the molecule. If provided, it will be used preferentially."
+            },
+            "inchi": {
+              "type": "string",
+              "description": "The InChI string representation of the molecule. Used if SMILES is not provided."
+            }
+          },
+          "required": []
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "stereo",
+        "description": "Parses and extracts stereochemical information from a given SMILES string. This includes the number of chiral centers, the R/S configuration of each center, E/Z configurations of double bonds, and all stereochemical features recognized by RDKit. This tool is particularly useful for checking stereochemical purity, generating stereoisomers, or validating stereochemical consistency of molecular structures.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "The input SMILES string of the molecule (supports explicit stereochemical annotations or automatic chirality inference)."
+            }
+          },
+          "required": ["smiles"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "functional_groups",
+        "description": "Automatically identifies common functional groups present in a molecule corresponding to a given SMILES string. The tool is based on substructure pattern (SMARTS) matching and can detect a wide range of organic functional groups such as carbonyls, carboxylic acids, amides, alcohols, amines, aromatic rings, halides, thiols, nitriles, and more, along with their specific matching locations. It is suitable for reactivity analysis, retrosynthetic planning, QSAR, and feature engineering tasks.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "smiles": {
+              "type": "string",
+              "description": "The SMILES string of the molecule. The tool will automatically search for all possible functional groups based on a SMARTS pattern library."
+            }
+          },
+          "required": ["smiles"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "name2smiles",
+        "description": "Retrieves the corresponding standardized SMILES representation based on an English chemical substance name. This tool queries databases to obtain the canonical structural formula of the compound and returns a valid SMILES string that can be parsed by RDKit. It supports common compound names, drug names, and some trivial names, and is suitable for text information extraction, structure retrieval, and rapid lookup.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The English name of a chemical substance, such as 'aspirin' or 'benzene'."
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "name2cas",
+        "description": "Retrieves the corresponding CAS Registry Number based on an English chemical substance name. This tool is useful for chemical standardization, material retrieval, and database cross-referencing. It supports queries for common compounds, pharmaceuticals, and some laboratory reagents.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string",
+              "description": "The English name of the chemical substance, such as 'acetone' or 'aspirin'."
+            }
+          },
+          "required": ["name"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "predict_reaction",
+        "description": "Predicts the most probable chemical reaction product based on the SMILES of the reactants and optional reagents. Supports multi-component mixtures, metal salts, solvents, and other complex chemical structures.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "reactants": {
+              "type": "string",
+              "description": "SMILES of the reactants, which may consist of a single molecule or a multi-component system (separated by '.'). Supports chiral centers, metal ions, salts, and complex structures."
+            },
+            "reagent": {
+              "type": "string",
+              "description": "Optional reagent SMILES. Can be empty. Supports single-component or multi-component structures."
+            }
+          },
+          "required": ["reactants"]
+        }
+      }
+    },
+    {
+      "type": "function",
+      "function": {
+        "name": "predict_retrosynthetic",
+        "description": "Predicts retrosynthetic precursors (reactants) based on the SMILES of a given product. The model automatically generates the most likely precursor combinations using bond-disconnection strategies and learned reaction patterns.",
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "product": {
+              "type": "string",
+              "description": "The SMILES string of the target product, for example 'CC(=O)Oc1ccccc1C(=O)O'."
+            }
+          },
+          "required": ["product"]
+        }
+      }
+    }
+  ]

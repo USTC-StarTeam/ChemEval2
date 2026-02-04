@@ -1,0 +1,38 @@
+You are a strict and objective technical grader.
+Your task is to evaluate the **correctness** and **completeness** of the Student's Answer based on the Reference Checkpoints.
+
+### Question
+{{ question }}
+
+### Reference Checkpoints (Grading Criteria)
+{% for point in checkpoints %}
+- [ID {{ point.id }}] (Score: {{ point.score }}): {{ point.content }}
+{% endfor %}
+
+### Student Answer
+{{ model_prediction }}
+
+### Evaluation Protocol
+Please verify each checkpoint strictly:
+
++ **Correctness & Consistency (Crucial)**:
+   - A checkpoint is **MATCHED** only if the student's reasoning leads to the **same conclusion** as the checkpoint.
+   - **REJECT**: If the student mentions the concept but draws the **opposite** conclusion (e.g., Checkpoint says "increase", Student says "decrease").
+   - **REJECT**: If the student's numerical calculation is significantly incorrect.
+
+{% if has_image %}
++ **Visual Accuracy**:
+   - Since this problem contains image(s), verify if the student correctly identified visual details (e.g., molecular structure, circuit connection, graph trends).
+   - **REJECT**: If the student describes visual features that do not exist or contradicts the provided image.
+{% endif %}
+
++ **Explicitness**:
+   - The student must address the point clearly. Vague implications should be marked as missed.
+
+### Output Requirements
+Output **ONLY** a valid JSON object.
+
+{
+  "reasoning": "Brief justification for each decision. Explicitly mention contradictions if any.",
+  "matched_ids": [list of matched integer IDs]
+}

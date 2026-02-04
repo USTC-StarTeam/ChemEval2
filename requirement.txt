@@ -1,0 +1,5 @@
+vllm>=0.4.0
+openai
+numpy
+tqdm
+jinja2
