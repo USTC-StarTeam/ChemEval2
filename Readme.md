@@ -1,15 +1,16 @@
 # ChemEval2 Inference & Evaluation Pipeline
 
-本项目提供了一套完整的自动化流程，用于对科学领域多模态模型进行推理（Inference）、基于裁判模型的评估（Evaluation）以及最终的指标统计（Metrics）。此外，还包含数据清洗工具，用于生成精简的评测报告。
+This project provides a comprehensive automated pipeline designed for **inference** of multimodal models in scientific domains, **judge-model-based evaluation**, and final **metrics calculation**. It also includes data cleaning tools for generating streamlined evaluation reports.
 
-支持 **本地 vLLM 部署** 和 **远程 API 调用** 两种运行模式。
+The pipeline supports two operating modes: **Local vLLM Deployment** and **Remote API Calls**.
 
-## 1. 环境准备 (Environment Setup)
+## 1. Environment Setup
 
-在开始之前，请确保 Python 环境（建议 3.9+）已经就绪，并根据硬件情况配置 CUDA 环境（如需本地部署）。
+Before starting, ensure your Python environment (recommended 3.9+) is ready and configure the CUDA environment based on your hardware (if local deployment is required).
 
-### 安装依赖
-请确保项目根目录下包含 `requirements.txt` 和 `tool_requirements.txt`文件，分别为主程序和MCP工具集的依赖并通过以下命令安装所需依赖库：
+### Install Dependencies
+
+Ensure the project root directory contains `requirements.txt` and `tool_requirements.txt` (dependencies for the main program and MCP toolset respectively), then install them using the following commands:
 
 ```bash
 pip install -r requirements.txt
@@ -18,48 +19,52 @@ pip install -r tool_requirements.txt
 
 ---
 
-## 2. 配置文件 (Configuration)
+## 2. Configuration
 
-运行项目前，必须在根目录下创建并配置 `config.py` 文件。该文件控制整个 pipeline 的运行逻辑。
+Before running the project, you must create and configure a `config.py` file in the root directory. This file controls the execution logic of the entire pipeline.
 
-**需要配置的主要模块包括：**
+**Main modules to configure include:**
 
-1. **全局模式选择 (`TEST_MODE`)**：
-* 设置为 `local_vllm`：使用本地显卡启动模型服务。
-* 设置为 `remote_api`：调用外部模型 API（如 GPT-4, Claude 等）。
-
-
-2. **路径设置**：
-* 指定输入数据的图片根目录。
-* 指定本地模型的权重路径 (Checkpoint Path)。
+1. **Global Mode Selection (`TEST_MODE`)**:
+   * Set to `local_vllm`: Uses local GPUs to start model services.
+   * Set to `remote_api`: Calls external model APIs (e.g., GPT-4, Claude, etc.).
 
 
-3. **API 密钥**：
-* 配置推理模型（如使用远程模式）的 API Key。
-* 配置裁判模型（Judge Model，通常为 GPT-4）的 API Key。
+2. **Path Settings**:
+   * Specify the root directory for input images.
+   * Specify the local model weight path (Checkpoint Path).
 
 
-4. **硬件参数**：
-* 针对本地模式，配置显存占用比例 (`gpu_memory_utilization`)。
-* 配置并行卡数 (Tensor Parallelism)。
+3. **API Keys**:
+   * Configure the API Key for the inference model (if using remote mode).
+   * Configure the API Key for the Judge Model (usually GPT-4).
+
+
+4. **Hardware Parameters**:
+   * For local mode, configure the GPU memory usage ratio (`gpu_memory_utilization`).
+   * Configure Tensor Parallelism (number of parallel GPUs).
+
+
 
 ---
 
-## 3. 运行教程 (Execution Guide)
+## 3. Execution Guide
 
-调用工具需要开启chemtool/chem_mcp中的MCP服务：**uvicorn chem_mcp.app:app --host 0.0.0.0 --port 9797**
+To invoke the tools, you need to start the MCP service in `chemtool/chem_mcp`:
 
-本项目提供两种运行方式：**Shell 脚本一键自动化** 和 **Python 分步执行**。
+**`uvicorn chem_mcp.app:app --host 0.0.0.0 --port 9797`**
 
-### 方式 A：Shell 脚本一键运行（推荐）
+This project provides two execution methods: **One-click Shell Script Automation** and **Step-by-step Python Execution**.
 
-使用 `run_pipeline.sh` 脚本可以自动化管理整个生命周期，包括服务启动、推理、评测和统计。
+### Method A: One-click Shell Script (Recommended)
 
-**步骤：**
+Use the `run_pipeline.sh` script to automatically manage the entire lifecycle, including service startup, inference, evaluation, and statistics.
 
-1. **修改 GPU 配置**：
-打开 `run_pipeline.sh`，根据您的机器实际情况修改显卡编号（如 `CUDA_VISIBLE_DEVICES`）。
-2. **执行脚本**：
+**Steps:**
+
+1. **Modify GPU Configuration**:
+Open `run_pipeline.sh` and modify the GPU indices (e.g., `CUDA_VISIBLE_DEVICES`) according to your machine's hardware.
+2. **Execute the Script**:
 ```bash
 chmod +x run_pipeline.sh
 ./run_pipeline.sh
@@ -67,26 +72,26 @@ chmod +x run_pipeline.sh
 
 
 
-**脚本主要行为：**
+**Main Script Actions:**
 
-* **服务自启**：若配置为本地模式，脚本会自动在后台启动 vLLM 服务并等待端口就绪。
-* **全流程执行**：依次串行执行 推理 -> 评测 -> 统计。
-* **自动清理**：任务完成或中断后，脚本会自动杀掉后台的模型服务进程，释放显存。
+* **Service Self-start**: If configured for local mode, the script automatically starts the vLLM service in the background and waits for the port to become ready.
+* **Full Flow Execution**: Executes Inference -> Evaluation -> Metrics in sequence.
+* **Auto Cleanup**: Upon task completion or interruption, the script automatically kills background model service processes to release GPU memory.
 
 ---
 
-### 方式 B：Python 分步手动执行
+### Method B: Step-by-step Manual Python Execution
 
-如果您需要调试特定环节，或通过其他方式管理模型服务，可按以下顺序分步操作。
+If you need to debug specific stages or manage model services via other means, follow these steps in order.
 
-#### Step 0: 启动模型服务 (仅 Local 模式)
+#### Step 0: Start Model Service (Local Mode Only)
 
-*如果 config.py 中设置为 `remote_api` 模式，请跳过此步。*
+*Skip this step if `config.py` is set to `remote_api` mode.*
 
-在一个单独的终端窗口中启动 vLLM 服务。请确保端口号 (`--port`) 与 `config.py` 中的设置一致。
+Start the vLLM service in a separate terminal window. Ensure the port number (`--port`) matches the setting in `config.py`.
 
 ```bash
-# 示例：使用两张显卡启动 Qwen 模型
+# Example: Starting a Qwen model with two GPUs
 CUDA_VISIBLE_DEVICES=0,1 python -m vllm.entrypoints.openai.api_server \
     --model "/path/to/your/model_weights" \
     --served-model-name "test-model" \
@@ -96,12 +101,12 @@ CUDA_VISIBLE_DEVICES=0,1 python -m vllm.entrypoints.openai.api_server \
     --tensor-parallel-size 2
 ```
 
-#### Step 1: 模型推理 (Inference)
+#### Step 1: Model Inference
 
-运行 `inference.py` 生成模型回答。
+Run `inference.py` to generate model answers.
 
-* **输入**：原始测试集 `.jsonl` 文件
-* **输出**：包含模型预测结果的 `.jsonl` 文件
+* **Input**: Original test set `.jsonl` file.
+* **Output**: `.jsonl` file containing model prediction results.
 
 ```bash
 python inference.py \
@@ -110,7 +115,7 @@ python inference.py \
     --template_path "templates/inference_prompt.jinja2"
 ```
 
-运行 `tool_inference.py` 生成工具增强推理答案。
+Run `tool_inference.py` to generate tool-augmented inference answers.
 
 ```bash
 if [ "$TEST_MODE" = "local_vllm" ]; then
@@ -124,67 +129,72 @@ else
         --output_file "$OUTPUT_DIR/tool_inference.jsonl" \
         --template_path "templates/model_inference.prompt"
 fi
-```bash
+```
 
-> **提示**：此步骤支持断点续传。如果程序中断，再次运行相同的命令，脚本会自动跳过已生成的 ID。
+> **Tip**: This step supports checkpointing. If the program is interrupted, re-running the same command will automatically skip IDs that have already been generated.
 
-#### Step 2: 裁判评测 (Evaluation)
+#### Step 2: Judge Evaluation
 
-运行 `evaluate.py` 调用裁判模型（如 GPT-4）进行打分。
+Run `evaluate.py` to call a judge model (e.g., GPT-4) for scoring.
 
-* **输入**：上一步生成的 `inference_output.jsonl`
-* **输出**：包含打分详情的 `evaluated_output.jsonl`
+* **Input**: The `inference_output.jsonl` generated in the previous step.
+* **Output**: `evaluated_output.jsonl` containing scoring details.
 
 ```bash
 python evaluate.py \
     --input_file "examples/experiments/inference_output.jsonl" \
     --output_file "examples/experiments/evaluated_output.jsonl" \
     --template_path "templates/judge_prompt.jinja2"
+
 ```
 
-调用裁判模型（如 GPT-4）对工具调用结果进行打分。
+Call the judge model (e.g., GPT-4) to score tool-calling results.
 
 ```bash
 python evaluate.py \
     --input_file "$OUTPUT_DIR/tool_inference.jsonl" \
     --output_file "$OUTPUT_DIR/tool_evaluated.jsonl" \
     --template_path "templates/judge_prompt.jinja2"
+
 python tool_evaluate.py \
     --input_file "$OUTPUT_DIR/tool_evaluated.jsonl" \
     --output_file "$OUTPUT_DIR/tooltrace_evaluated.jsonl" \
     --template_path "templates/tool_judge_prompt.jinja2"
 ```
 
-#### Step 3: 指标统计 (Metrics)
+#### Step 3: Metrics Calculation
 
-运行 `metrics.py` 和 `tool_metrics.py` 计算最终得分率。
+Run `metrics.py` and `tool_metrics.py` to calculate the final score rates.
 
-* **输入**：上一步生成的 `evaluated_output.jsonl`
-* **输出**：包含分数的完整数据 `final_metrics.jsonl`
+* **Input**: The `evaluated_output.jsonl` generated in the previous step.
+* **Output**: Complete data file `final_metrics.jsonl` including scores.
 
 ```bash
 python metrics.py \
     --input_file "examples/experiments/evaluated_output.jsonl" \
     --output_file "examples/experiments/final_metrics.jsonl"
+
 python metrics.py \
     --input_file "$OUTPUT_DIR/tooltrace_evaluated.jsonl" \
     --output_file "$OUTPUT_DIR/tool_final_metrics.jsonl"
+
 python tool_metrics.py \
     --input_file "$OUTPUT_DIR/tool_final_metrics.jsonl" \
     --output_file "$OUTPUT_DIR/tooltrace_final_metrics.jsonl"
 ```
 
-#### Step 4: 结果提取 (Extract Results)
+#### Step 4: Result Extraction
 
-运行 `extract_results.py` 和 `tool_extract_results.py` 生成精简版报告（包含ID、预测、裁判理由及分数）。
+Run `extract_results.py` and `tool_extract_results.py` to generate streamlined reports (containing ID, prediction, judge reasoning, and scores).
 
-* **输入**：上一步生成的 `final_metrics.jsonl`
-* **输出**：精简后的 `final_clean_report.jsonl`
+* **Input**: The `final_metrics.jsonl` generated in the previous step.
+* **Output**: The cleaned report `final_clean_report.jsonl`.
 
 ```bash
 python extract_results.py \
     --input_file "examples/experiments/final_metrics.jsonl" \
     --output_file "examples/experiments/final_clean_report.jsonl"
+
 python tool_extract_results.py \
     --input_file "$OUTPUT_DIR/tooltrace_final_metrics.jsonl" \
     --output_file "$OUTPUT_DIR/tool_final_clean_report.jsonl"
@@ -192,13 +202,13 @@ python tool_extract_results.py \
 
 ---
 
-## 4. 产出文件 (Outputs)
+## 4. Outputs
 
-流程结束后，输出目录（默认为 `experiments/` 下的带时间戳文件夹）将包含以下关键文件：
+After the pipeline finishes, the output directory (defaulting to a timestamped folder under `experiments/`) will contain the following key files:
 
-| 文件名 | 内容描述 |
+| Filename | Description |
 | --- | --- |
-| **inference.jsonl、tool_inference.jsonl** | 包含模型的原始预测内容 (`model_prediction`、`tool_trace`)。 |
-| **evaluated.jsonl、 tool_evaluated.jsonl、 tooltrace_evaluated.jsonl** | 在前者基础上增加了 `evaluation_result`、 `tool_evaluation_result` 字段，包含裁判的打分详情。 |
-| **final_metrics.final_metrics.jsonl、 tooltrace_final_metrics.jsonl** | 包含所有字段的完整结果，增加了 `metrics` 对象（`score_overall`, `score_final`, `tool_score_overall`, `tool_score_final`）。 |
-| **final_clean_report.jsonl、 tool_final_clean_report.jsonl** | **精简报告**：仅提取 ID、模型回答、裁判理由及最终分数，便于快速查阅和上传。 |
+| **inference.jsonl, tool_inference.jsonl** | Contains raw model predictions (`model_prediction`, `tool_trace`). |
+| **evaluated.jsonl, tool_evaluated.jsonl, tooltrace_evaluated.jsonl** | Builds on the above by adding `evaluation_result` and `tool_evaluation_result` fields with judge scoring details. |
+| **final_metrics.jsonl, tooltrace_final_metrics.jsonl** | Full results containing all fields plus a `metrics` object (`score_overall`, `score_final`, `tool_score_overall`, `tool_score_final`). |
+| **final_clean_report.jsonl, tool_final_clean_report.jsonl** | **Streamlined Report**: Extracts only IDs, model answers, judge reasoning, and final scores for quick review and upload. |
